@@ -6,6 +6,7 @@ import RiskBadge from '@/components/RiskBadge';
 import ShareButton from '@/components/ShareButton';
 import { RISK_LEVEL_CONFIG } from '@/types/report';
 import { SYMPTOM_LABELS, DAYTIME_LABELS } from '@/types/observation';
+import { analyze7DayTrend, generateTrendSummary, getTrendEmoji, getTrendTextColor } from '@/utils/trendAnalysis';
 import styles from './index.module.scss';
 
 const SEVERITY_LABELS: Record<string, string> = {
@@ -72,6 +73,10 @@ const ReportPage: React.FC = () => {
     Object.keys(DAYTIME_LABELS).includes(s.name)
   );
 
+  const trends = analyze7DayTrend(observations);
+  const trendSummary = generateTrendSummary(trends);
+  const hasTrendData = trends.some(t => t.hasData);
+
   const getSeverityStyle = (severity: string) => {
     switch (severity) {
       case 'none': return styles.severityNone;
@@ -104,6 +109,29 @@ const ReportPage: React.FC = () => {
               backgroundColor: config.color,
             }}
           />
+        </View>
+      </View>
+
+      <View className={styles.trendCard}>
+        <View className={styles.trendHeader}>
+          <Text className={styles.trendTitle}>📊 最近7天趋势</Text>
+          <Text style={{ fontSize: '24rpx', color: '#8E9AAB' }}>
+            {hasTrendData ? `共${trends[0].totalDays}天记录` : '暂无数据'}
+          </Text>
+        </View>
+        <Text className={styles.trendSummary}>{trendSummary}</Text>
+        <View className={styles.trendList}>
+          {trends.map(trend => (
+            <View key={trend.key} className={styles.trendItem}>
+              <Text className={styles.trendItemName}>{trend.label}</Text>
+              <View className={styles.trendItemValue}>
+                <Text style={{ fontSize: '32rpx' }}>{getTrendEmoji(trend.direction)}</Text>
+                <Text style={{ color: getTrendTextColor(trend.direction) }}>
+                  {trend.description.replace(trend.label, '')}
+                </Text>
+              </View>
+            </View>
+          ))}
         </View>
       </View>
 

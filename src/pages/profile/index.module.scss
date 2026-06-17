@@ -342,3 +342,173 @@
   width: 100%;
   text-align: center;
 }
+
+.editBtn {
+  @include button-reset;
+  height: 60rpx;
+  padding: 0 28rpx;
+  background-color: $color-tag-bg-blue;
+  border-radius: $radius-round;
+  margin-top: $spacing-md;
+  border: none;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.editBtnText {
+  font-size: $font-size-sm;
+  color: $color-primary-dark;
+  white-space: nowrap;
+}
+
+.measureHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-md;
+}
+
+.historyToggle {
+  font-size: $font-size-sm;
+  color: $color-primary;
+  white-space: nowrap;
+}
+
+.historyList {
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  margin: $spacing-md 0;
+  padding: $spacing-sm 0;
+}
+
+.historyItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $spacing-sm $spacing-md;
+  border-bottom: 2rpx solid $color-divider;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.historyItemLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.historyValue {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.historyDate {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-top: 4rpx;
+}
+
+.deleteLink {
+  font-size: $font-size-sm;
+  color: $color-error;
+  padding: $spacing-xs $spacing-sm;
+}
+
+.noHistoryText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  padding: $spacing-md 0;
+  display: block;
+}
+
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  width: 85%;
+  max-width: 600rpx;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-popup;
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.modalTitle {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.modalClose {
+  font-size: $font-size-xl;
+  color: $color-text-tertiary;
+  padding: $spacing-xs;
+  line-height: 1;
+}
+
+.modalBtnRow {
+  display: flex;
+  gap: $spacing-md;
+  margin-top: $spacing-lg;
+}
+
+.modalCancelBtn {
+  @include button-reset;
+  flex: 1;
+  height: 80rpx;
+  background-color: $color-bg-page;
+  border-radius: $radius-button;
+  border: none;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.modalCancelBtnText {
+  font-size: $font-size-md;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.modalConfirmBtn {
+  @include button-reset;
+  flex: 1;
+  height: 80rpx;
+  background: linear-gradient(135deg, $color-primary 0%, $color-primary-light 100%);
+  border-radius: $radius-button;
+  border: none;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.modalConfirmBtnText {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  color: $color-text-white;
+  white-space: nowrap;
+}

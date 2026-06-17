@@ -19,7 +19,9 @@ interface ChildStore {
   loadFromStorage: () => void;
   setChild: (data: ChildFormData) => void;
   addHeight: (value: number) => void;
+  deleteHeightRecord: (index: number) => void;
   addWeight: (value: number) => void;
+  deleteWeightRecord: (index: number) => void;
   addPhoto: (photo: PhotoRecord) => Promise<void>;
   addObservation: (data: ObservationFormData) => void;
   deleteObservation: (id: string) => void;
@@ -118,6 +120,7 @@ export const useChildStore = create<ChildStore>((set, get) => ({
     };
     safeSetStorage(CHILD_STORAGE_KEY, child);
     set({ child });
+    get().calculateAndUpdateRisk();
   },
 
   addHeight: (value: number) => {
@@ -135,6 +138,17 @@ export const useChildStore = create<ChildStore>((set, get) => ({
     set({ child: updated });
   },
 
+  deleteHeightRecord: (index: number) => {
+    const child = get().child;
+    if (!child || index < 0 || index >= child.heightHistory.length) return;
+    const updated: ChildProfile = {
+      ...child,
+      heightHistory: child.heightHistory.filter((_, i) => i !== index),
+    };
+    safeSetStorage(CHILD_STORAGE_KEY, updated);
+    set({ child: updated });
+  },
+
   addWeight: (value: number) => {
     const child = get().child;
     if (!child) return;
@@ -145,6 +159,17 @@ export const useChildStore = create<ChildStore>((set, get) => ({
     const updated: ChildProfile = {
       ...child,
       weightHistory: [...child.weightHistory, record],
+    };
+    safeSetStorage(CHILD_STORAGE_KEY, updated);
+    set({ child: updated });
+  },
+
+  deleteWeightRecord: (index: number) => {
+    const child = get().child;
+    if (!child || index < 0 || index >= child.weightHistory.length) return;
+    const updated: ChildProfile = {
+      ...child,
+      weightHistory: child.weightHistory.filter((_, i) => i !== index),
     };
     safeSetStorage(CHILD_STORAGE_KEY, updated);
     set({ child: updated });
