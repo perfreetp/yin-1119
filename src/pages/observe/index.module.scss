@@ -44,6 +44,96 @@
   color: $color-text-primary;
 }
 
+.dateChangeBtn {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  padding: 8rpx 20rpx;
+  background-color: $color-tag-bg-blue;
+  border-radius: $radius-round;
+}
+
+.existingRecords {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+}
+
+.existingTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-md;
+  display: block;
+}
+
+.existingCount {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-left: $spacing-sm;
+  font-weight: normal;
+}
+
+.recordItem {
+  background-color: $color-bg-page;
+  border-radius: $radius-md;
+  padding: $spacing-md;
+  margin-bottom: $spacing-sm;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.recordTime {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-xs;
+  display: block;
+}
+
+.recordSymptoms {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  margin-bottom: $spacing-xs;
+}
+
+.recordTag {
+  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-round;
+  background-color: $color-tag-bg-red;
+  color: $color-error;
+}
+
+.recordTagNone {
+  background-color: $color-tag-bg-green;
+  color: $color-success;
+}
+
+.recordNotes {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  line-height: $line-height-tight;
+}
+
+.recordDelete {
+  font-size: $font-size-xs;
+  color: $color-error;
+  margin-top: $spacing-xs;
+  display: block;
+  text-align: right;
+}
+
+.noRecordTip {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  text-align: center;
+  padding: $spacing-md 0;
+}
+
 .sectionCard {
   background-color: $color-bg-card;
   border-radius: $radius-lg;

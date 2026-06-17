@@ -1,4 +1,4 @@
-import type { NightObservation } from '@/types/observation';
+import type { NightObservation, SymptomRecord, FrequencyLevel, DaytimeLevel } from '@/types/observation';
 import { SYMPTOM_LABELS } from '@/types/observation';
 import dayjs from 'dayjs';
 
@@ -15,24 +15,81 @@ export interface SymptomTrend {
   description: string;
 }
 
-const FREQUENCY_SCORE: Record<string, number> = {
+const FREQUENCY_SCORE: Record<FrequencyLevel, number> = {
   none: 0,
   occasional: 1,
   frequent: 2,
   constant: 3,
 };
 
-const MAIN_SYMPTOMS = ['snoring', 'mouthBreathing', 'nightWaking', 'tossing', 'drooling'];
+const DAYTIME_SCORE: Record<DaytimeLevel, number> = {
+  good: 0,
+  normal: 1,
+  poor: 2,
+  very_poor: 3,
+};
+
+const MAIN_SYMPTOMS = ['snoring', 'mouthBreathing', 'nightWaking', 'tossing', 'drooling'] as const;
+
+function aggregateByDate(observations: NightObservation[]): NightObservation[] {
+  const dateMap = new Map<string, NightObservation[]>();
+  observations.forEach(o => {
+    const list = dateMap.get(o.date) || [];
+    list.push(o);
+    dateMap.set(o.date, list);
+  });
+  const result: NightObservation[] = [];
+  dateMap.forEach((list, date) => {
+    const aggregated: NightObservation = {
+      id: `agg_${date}`,
+      childId: list[0].childId,
+      date,
+      snoring: aggregateSymptom(list.map(l => l.snoring)),
+      mouthBreathing: aggregateSymptom(list.map(l => l.mouthBreathing)),
+      drooling: aggregateSymptom(list.map(l => l.drooling)),
+      tossing: aggregateSymptom(list.map(l => l.tossing)),
+      nightWaking: aggregateSymptom(list.map(l => l.nightWaking)),
+      daytimeAttention: aggregateDaytime(list.map(l => l.daytimeAttention)),
+      daytimeEnergy: aggregateDaytime(list.map(l => l.daytimeEnergy)),
+      daytimeMood: aggregateDaytime(list.map(l => l.daytimeMood)),
+      notes: list.map(l => l.notes).filter(Boolean).join('；'),
+      createdAt: list[0].createdAt,
+    };
+    result.push(aggregated);
+  });
+  return result.sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
+}
+
+function aggregateSymptom(records: SymptomRecord[]): SymptomRecord {
+  const maxScore = Math.max(...records.map(r => FREQUENCY_SCORE[r.frequency]));
+  let frequency: FrequencyLevel = 'none';
+  (Object.keys(FREQUENCY_SCORE) as FrequencyLevel[]).forEach(key => {
+    if (FREQUENCY_SCORE[key] === maxScore) frequency = key;
+  });
+  return {
+    present: maxScore > 0,
+    frequency,
+  };
+}
+
+function aggregateDaytime(levels: DaytimeLevel[]): DaytimeLevel {
+  const avg = levels.reduce((s, l) => s + DAYTIME_SCORE[l], 0) / levels.length;
+  if (avg <= 0.5) return 'good';
+  if (avg <= 1.5) return 'normal';
+  if (avg <= 2.5) return 'poor';
+  return 'very_poor';
+}
 
 export function analyze7DayTrend(observations: NightObservation[]): SymptomTrend[] {
-  const sorted = [...observations]
-    .filter(o => {
-      const diff = dayjs().diff(dayjs(o.date), 'day');
-      return diff >= 0 && diff < 7;
-    })
-    .sort((a, b) => dayjs(a.date).valueOf() - dayjs(b.date).valueOf());
+  const inRange = observations.filter(o => {
+    const diff = dayjs().diff(dayjs(o.date), 'day');
+    return diff >= 0 && diff < 7;
+  });
 
-  if (sorted.length === 0) {
+  const sorted = aggregateByDate(inRange);
+  const uniqueDates = sorted.length;
+
+  if (uniqueDates === 0) {
     return MAIN_SYMPTOMS.map(key => ({
       key,
       label: SYMPTOM_LABELS[key] || key,
@@ -45,26 +102,36 @@ export function analyze7DayTrend(observations: NightObservation[]): SymptomTrend
     }));
   }
 
-  if (sorted.length < 2) {
+  if (uniqueDates < 2) {
     return MAIN_SYMPTOMS.map(key => ({
       key,
       label: SYMPTOM_LABELS[key] || key,
       direction: 'insufficient' as TrendDirection,
       firstHalfAvg: 0,
       secondHalfAvg: 0,
-      totalDays: sorted.length,
+      totalDays: uniqueDates,
       hasData: true,
       description: '记录还不够，继续观察',
     }));
   }
 
-  const midPoint = Math.max(1, Math.ceil(sorted.length / 2));
+  const midPoint = Math.max(1, Math.ceil(uniqueDates / 2));
   const firstHalf = sorted.slice(0, midPoint);
   const secondHalf = sorted.slice(midPoint);
 
   return MAIN_SYMPTOMS.map(key => {
-    const firstScore = firstHalf.reduce((sum, o) => sum + FREQUENCY_SCORE[o[key].frequency], 0);
-    const secondScore = secondHalf.reduce((sum, o) => sum + FREQUENCY_SCORE[o[key].frequency], 0);
+    const getSymptomFreq = (o: NightObservation): FrequencyLevel => {
+      switch (key) {
+        case 'snoring': return o.snoring.frequency;
+        case 'mouthBreathing': return o.mouthBreathing.frequency;
+        case 'nightWaking': return o.nightWaking.frequency;
+        case 'tossing': return o.tossing.frequency;
+        case 'drooling': return o.drooling.frequency;
+        default: return 'none';
+      }
+    };
+    const firstScore = firstHalf.reduce((sum, o) => sum + FREQUENCY_SCORE[getSymptomFreq(o)], 0);
+    const secondScore = secondHalf.reduce((sum, o) => sum + FREQUENCY_SCORE[getSymptomFreq(o)], 0);
     const firstAvg = firstScore / firstHalf.length;
     const secondAvg = secondScore / secondHalf.length;
 
@@ -93,7 +160,7 @@ export function analyze7DayTrend(observations: NightObservation[]): SymptomTrend
       direction,
       firstHalfAvg,
       secondHalfAvg,
-      totalDays: sorted.length,
+      totalDays: uniqueDates,
       hasData: true,
       description,
     };

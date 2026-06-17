@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, Textarea } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useChildStore } from '@/store/useChildStore';
-import type { SymptomRecord, DaytimeLevel, ObservationFormData } from '@/types/observation';
+import type { SymptomRecord, DaytimeLevel, ObservationFormData, NightObservation } from '@/types/observation';
 import { FREQUENCY_OPTIONS, DAYTIME_OPTIONS, SYMPTOM_LABELS, DAYTIME_LABELS } from '@/types/observation';
 import type { FrequencyLevel } from '@/types/observation';
 import dayjs from 'dayjs';
@@ -27,6 +27,8 @@ const defaultSymptom: SymptomRecord = { present: false, frequency: 'none' };
 const ObservePage: React.FC = () => {
   const child = useChildStore(state => state.child);
   const addObservation = useChildStore(state => state.addObservation);
+  const deleteObservation = useChildStore(state => state.deleteObservation);
+  const observations = useChildStore(state => state.observations);
 
   const [date, setDate] = useState(dayjs().format('YYYY-MM-DD'));
   const [symptoms, setSymptoms] = useState<Record<string, SymptomRecord>>({
@@ -43,6 +45,11 @@ const ObservePage: React.FC = () => {
   });
   const [notes, setNotes] = useState('');
 
+  const todayRecords = useMemo(() => {
+    if (!child) return [];
+    return observations.filter(o => o.childId === child.id && o.date === date);
+  }, [observations, child?.id, date]);
+
   const handleFrequencyChange = (symptomKey: string, frequency: FrequencyLevel) => {
     setSymptoms(prev => ({
       ...prev,
@@ -52,6 +59,67 @@ const ObservePage: React.FC = () => {
 
   const handleDaytimeChange = (key: string, value: DaytimeLevel) => {
     setDaytime(prev => ({ ...prev, [key]: value }));
+  };
+
+  const handleDateChange = () => {
+    const today = dayjs();
+    const dateStr = date;
+    Taro.showActionSheet({
+      itemList: [
+        '今天',
+        '昨天',
+        '前天',
+        '3天前',
+        '手动选择日期',
+      ],
+      success: (res) => {
+        let target = today;
+        switch (res.tapIndex) {
+          case 0: target = today; break;
+          case 1: target = today.subtract(1, 'day'); break;
+          case 2: target = today.subtract(2, 'day'); break;
+          case 3: target = today.subtract(3, 'day'); break;
+          case 4:
+            Taro.showModal({
+              title: '选择观察日期',
+              editable: true,
+              placeholderText: '如：2025-06-15',
+              content: dateStr,
+              success: (modalRes) => {
+                if (modalRes.confirm) {
+                  const val = (modalRes.content || '').trim();
+                  if (!val) return;
+                  const parsed = dayjs(val);
+                  if (!parsed.isValid() || parsed.format('YYYY-MM-DD') !== val) {
+                    Taro.showToast({ title: '日期格式不正确', icon: 'none' });
+                    return;
+                  }
+                  if (parsed.isAfter(today)) {
+                    Taro.showToast({ title: '不能选择未来日期', icon: 'none' });
+                    return;
+                  }
+                  setDate(val);
+                }
+              },
+            });
+            return;
+        }
+        setDate(target.format('YYYY-MM-DD'));
+      },
+    });
+  };
+
+  const handleDeleteRecord = (id: string) => {
+    Taro.showModal({
+      title: '删除记录',
+      content: '确定删除这条观察记录吗？',
+      success: (res) => {
+        if (res.confirm) {
+          deleteObservation(id);
+          Taro.showToast({ title: '已删除', icon: 'success' });
+        }
+      },
+    });
   };
 
   const handleSave = () => {
@@ -89,7 +157,6 @@ const ObservePage: React.FC = () => {
       daytimeMood: 'normal',
     });
     setNotes('');
-    setDate(dayjs().format('YYYY-MM-DD'));
   };
 
   if (!child) {
@@ -121,8 +188,52 @@ const ObservePage: React.FC = () => {
       </Text>
 
       <View className={styles.dateCard}>
-        <Text className={styles.dateLabel}>观察日期</Text>
-        <Text className={styles.dateValue}>{date}</Text>
+        <View>
+          <Text className={styles.dateLabel}>观察日期</Text>
+          <Text className={styles.dateValue}>{date}</Text>
+        </View>
+        <Text className={styles.dateChangeBtn} onClick={handleDateChange}>选择日期</Text>
+      </View>
+
+      <View className={styles.existingRecords}>
+        <Text className={styles.existingTitle}>
+          📋 当天已记录
+          {todayRecords.length > 0 && (
+            <Text className={styles.existingCount}>（{todayRecords.length}条）</Text>
+          )}
+        </Text>
+        {todayRecords.length === 0 ? (
+          <Text className={styles.noRecordTip}>当天还没有记录，填写下方表单开始记录~</Text>
+        ) : (
+          todayRecords.map(record => (
+            <View key={record.id} className={styles.recordItem}>
+              <Text className={styles.recordTime}>记录时间：{record.createdAt}</Text>
+              <View className={styles.recordSymptoms}>
+                {Object.entries(SYMPTOM_LABELS).map(([key, label]) => {
+                  const symptom = (record as any)[key];
+                  if (!symptom || !symptom.present) {
+                    return (
+                      <Text key={key} className={`${styles.recordTag} ${styles.recordTagNone}`}>
+                        {label}：无
+                      </Text>
+                    );
+                  }
+                  return (
+                    <Text key={key} className={styles.recordTag}>
+                      {label}：{FREQUENCY_OPTIONS.find(o => o.value === symptom.frequency)?.label}
+                    </Text>
+                  );
+                })}
+              </View>
+              {record.notes && (
+                <Text className={styles.recordNotes}>备注：{record.notes}</Text>
+              )}
+              <Text className={styles.recordDelete} onClick={() => handleDeleteRecord(record.id)}>
+                删除此条
+              </Text>
+            </View>
+          ))
+        )}
       </View>
 
       <View className={styles.sectionCard}>
