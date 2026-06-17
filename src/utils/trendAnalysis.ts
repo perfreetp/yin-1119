@@ -2,7 +2,7 @@ import type { NightObservation } from '@/types/observation';
 import { SYMPTOM_LABELS } from '@/types/observation';
 import dayjs from 'dayjs';
 
-export type TrendDirection = 'up' | 'down' | 'stable' | 'no_data';
+export type TrendDirection = 'up' | 'down' | 'stable' | 'no_data' | 'insufficient';
 
 export interface SymptomTrend {
   key: string;
@@ -42,6 +42,19 @@ export function analyze7DayTrend(observations: NightObservation[]): SymptomTrend
       totalDays: 0,
       hasData: false,
       description: '最近7天还没有观察记录',
+    }));
+  }
+
+  if (sorted.length < 2) {
+    return MAIN_SYMPTOMS.map(key => ({
+      key,
+      label: SYMPTOM_LABELS[key] || key,
+      direction: 'insufficient' as TrendDirection,
+      firstHalfAvg: 0,
+      secondHalfAvg: 0,
+      totalDays: sorted.length,
+      hasData: true,
+      description: '记录还不够，继续观察',
     }));
   }
 
@@ -92,6 +105,7 @@ export function getTrendEmoji(direction: TrendDirection): string {
     case 'up': return '📈';
     case 'down': return '📉';
     case 'stable': return '➡️';
+    case 'insufficient': return '⏳';
     default: return '—';
   }
 }
@@ -101,6 +115,7 @@ export function getTrendTextColor(direction: TrendDirection): string {
     case 'up': return '#E76F6F';
     case 'down': return '#7EC88B';
     case 'stable': return '#6BA3BE';
+    case 'insufficient': return '#F4A261';
     default: return '#8E9AAB';
   }
 }
@@ -109,6 +124,11 @@ export function generateTrendSummary(trends: SymptomTrend[]): string {
   const hasData = trends.some(t => t.hasData);
   if (!hasData) {
     return '最近7天还没有观察记录，今晚开始记录就能看到趋势啦~';
+  }
+
+  const hasInsufficient = trends.some(t => t.direction === 'insufficient');
+  if (hasInsufficient) {
+    return '目前记录还不够，再观察几天就能看到趋势变化啦~';
   }
 
   const notable = trends.filter(t => t.hasData && t.direction !== 'stable' && t.direction !== 'no_data');
