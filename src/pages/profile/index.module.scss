@@ -87,10 +87,19 @@
   color: $color-text-primary;
   background-color: $color-bg-page;
   box-sizing: border-box;
+  display: flex;
+  align-items: center;
 
   &:focus {
     border-color: $color-primary;
   }
+}
+
+.formError {
+  font-size: $font-size-xs;
+  color: $color-error;
+  margin-top: $spacing-xs;
+  display: block;
 }
 
 .genderRow {
@@ -297,6 +306,10 @@
   }
 }
 
+.photoBtnDisabled {
+  opacity: 0.6;
+}
+
 .photoBtnText {
   font-size: $font-size-sm;
   color: $color-accent;
@@ -320,4 +333,12 @@
 .photoImg {
   width: 100%;
   height: 100%;
+}
+
+.photoEmpty {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  padding: $spacing-lg 0;
+  width: 100%;
+  text-align: center;
 }
