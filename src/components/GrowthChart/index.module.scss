@@ -1,0 +1,86 @@
+@use '@/styles/variables.scss' as *;
+
+.chart {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: $spacing-lg;
+}
+
+.title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+}
+
+.unit {
+  font-size: $font-size-xs;
+  color: $color-text-tertiary;
+}
+
+.chartArea {
+  width: 100%;
+  height: 300rpx;
+  display: flex;
+  align-items: flex-end;
+}
+
+.bars {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  width: 100%;
+  height: 100%;
+}
+
+.barWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 1;
+  height: 100%;
+}
+
+.barValue {
+  font-size: $font-size-xs;
+  color: $color-text-secondary;
+  margin-bottom: 8rpx;
+  white-space: nowrap;
+}
+
+.bar {
+  width: 40rpx;
+  border-radius: $radius-sm $radius-sm 0 0;
+  min-height: 8rpx;
+  transition: height $transition-base;
+}
+
+.barDate {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  margin-top: 8rpx;
+  white-space: nowrap;
+}
+
+.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200rpx;
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-card;
+}
+
+.emptyText {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+}

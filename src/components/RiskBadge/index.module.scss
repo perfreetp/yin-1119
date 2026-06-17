@@ -1,0 +1,29 @@
+@use '@/styles/variables.scss' as *;
+
+.badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8rpx 24rpx;
+  border-radius: $radius-round;
+  min-width: 120rpx;
+}
+
+.label {
+  font-size: $font-size-sm;
+  font-weight: $font-weight-semibold;
+  color: $color-text-white;
+}
+
+.description {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  margin-top: $spacing-sm;
+  line-height: $line-height-normal;
+}

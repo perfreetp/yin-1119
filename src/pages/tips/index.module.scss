@@ -1,0 +1,175 @@
+@use '@/styles/variables.scss' as *;
+
+.tipsPage {
+  min-height: 100vh;
+  background-color: $color-bg-page;
+  padding: $spacing-lg $page-padding 160rpx;
+}
+
+.pageTitle {
+  font-size: $font-size-xl;
+  font-weight: $font-weight-bold;
+  color: $color-text-primary;
+  margin-bottom: $spacing-xs;
+  display: block;
+}
+
+.pageDesc {
+  font-size: $font-size-sm;
+  color: $color-text-tertiary;
+  margin-bottom: $spacing-lg;
+  display: block;
+}
+
+.categoryRow {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-lg;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.categoryBtn {
+  @include button-reset;
+  height: 64rpx;
+  padding: 0 32rpx;
+  border-radius: $radius-round;
+  border: 2rpx solid $color-border;
+  background-color: $color-bg-card;
+  white-space: nowrap;
+
+  &:active {
+    opacity: 0.9;
+  }
+}
+
+.categoryBtnActive {
+  border-color: $color-primary;
+  background-color: $color-tag-bg-blue;
+}
+
+.categoryBtnText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  white-space: nowrap;
+}
+
+.categoryBtnTextActive {
+  color: $color-primary-dark;
+  font-weight: $font-weight-medium;
+}
+
+.tipCard {
+  background-color: $color-bg-card;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-card;
+  margin-bottom: $spacing-md;
+  transition: all $transition-base;
+
+  &:active {
+    opacity: 0.95;
+  }
+}
+
+.tipHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: $spacing-sm;
+}
+
+.tipTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-text-primary;
+  flex: 1;
+  margin-right: $spacing-sm;
+}
+
+.tipCategory {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  background-color: $color-tag-bg-blue;
+  padding: 4rpx 16rpx;
+  border-radius: $radius-round;
+  white-space: nowrap;
+}
+
+.tipSummary {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+  margin-bottom: $spacing-sm;
+}
+
+.tipTags {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.tipTag {
+  font-size: 20rpx;
+  color: $color-text-tertiary;
+  background-color: $color-bg-page;
+  padding: 4rpx 12rpx;
+  border-radius: $radius-xs;
+}
+
+.expandBtn {
+  @include button-reset;
+  height: 48rpx;
+  margin-top: $spacing-sm;
+  background: none;
+  border: none;
+
+  &:active {
+    opacity: 0.7;
+  }
+}
+
+.expandBtnText {
+  font-size: $font-size-xs;
+  color: $color-primary;
+  white-space: nowrap;
+}
+
+.tipContent {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-loose;
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 2rpx solid $color-divider;
+  white-space: pre-wrap;
+}
+
+.reminderCard {
+  background: linear-gradient(135deg, $color-accent-light 0%, $color-bg-warm 100%);
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  margin-bottom: $spacing-md;
+  box-shadow: $shadow-card;
+}
+
+.reminderTitle {
+  font-size: $font-size-md;
+  font-weight: $font-weight-semibold;
+  color: $color-accent-dark;
+  margin-bottom: $spacing-sm;
+  display: block;
+}
+
+.reminderText {
+  font-size: $font-size-sm;
+  color: $color-text-secondary;
+  line-height: $line-height-normal;
+}
+
+.reminderDate {
+  font-size: $font-size-sm;
+  color: $color-accent-dark;
+  font-weight: $font-weight-medium;
+  margin-top: $spacing-sm;
+  display: block;
+}
